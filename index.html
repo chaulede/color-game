@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>颜色配对挑战 - Color Game</title>
+    <style>
+        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #fff9c4; text-align: center; margin: 0; padding: 20px; touch-action: manipulation; }
+        h1 { color: #5d4037; margin-bottom: 10px; }
+        .game-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 1000px; margin: 20px auto; }
+        .slot { border: 3px dashed #bcaaa4; border-radius: 15px; padding: 10px; width: 130px; background: white; transition: all 0.3s; }
+        .slot.correct { border-color: #4caf50; background-color: #e8f5e9; }
+        .label { margin-top: 8px; font-weight: bold; color: #2e7d32; font-size: 1.1em; min-height: 1.2em; }
+        .word-bank { margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px; background: rgba(255,255,255,0.8); border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .word { background: #795548; color: white; padding: 10px 15px; border-radius: 10px; cursor: grab; font-size: 1.1em; box-shadow: 0 3px #5d4037; user-select: none; }
+        .word.hidden { opacity: 0; pointer-events: none; }
+        .pinyin { font-size: 0.6em; display: block; opacity: 0.9; }
+        #message { margin-top: 15px; font-size: 1.8em; color: #d32f2f; font-weight: bold; height: 40px; }
+        svg { filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1)); }
+    </style>
+</head>
+<body>
+    <h1>🎨 颜色配对挑战 🐶</h1>
+    <p>将单词拖动到对应颜色的图片上！</p>
+    <div class="game-container" id="slots"></div>
+    <div id="message"></div>
+    <div class="word-bank" id="words"></div>
+    <script>
+        const colorData = [
+            { name: '红色', py: 'hóng sè', hex: '#E60000' }, [cite: 3, 4]
+            { name: '绿色', py: 'lǜ sè', hex: '#00FF00' }, [cite: 5, 6]
+            { name: '紫色', py: 'zǐ sè', hex: '#CC00FF' }, [cite: 7, 8]
+            { name: '蓝色', py: 'lán sè', hex: '#3333FF' }, [cite: 9, 10]
+            { name: '橙色', py: 'chéng sè', hex: '#FF6600' }, [cite: 11, 12]
+            { name: '棕色', py: 'zōng sè', hex: '#663300' }, [cite: 13, 14]
+            { name: '黄色', py: 'huáng sè', hex: '#FFD700' }, [cite: 15, 16]
+            { name: '黑色', py: 'hēi sè', hex: '#000000' }, [cite: 17, 18]
+            { name: '粉色', py: 'fěn sè', hex: '#FF66CC' }, [cite: 19, 20]
+            { name: '白色', py: 'bái sè', hex: '#FFFFFF' }  [cite: 21, 22]
+        ];
+        function createPoop(color) {
+            return `<svg viewBox="0 0 100 80" width="100"><path d="M50 5 C35 5 25 15 25 25 Q25 35 35 38 T50 40 T65 38 T75 25 Q75 15 60 5 Z" fill="${color}" stroke="black" stroke-width="2"/><path d="M20 45 C5 45 5 75 50 75 C95 75 95 45 80 45 Q70 42 50 42 Q30 42 20 45 Z" fill="${color}" stroke="black" stroke-width="2"/><path d="M35 25 Q50 18 65 25" fill="none" stroke="black" stroke-width="1" opacity="0.3"/><path d="M30 55 Q50 48 70 55" fill="none" stroke="black" stroke-width="1" opacity="0.3"/></svg>`;
+        }
+        const slots = document.getElementById('slots');
+        const bank = document.getElementById('words');
+        let count = 0;
+        [...colorData].sort(() => Math.random() - 0.5).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'slot';
+            div.dataset.target = item.name;
+            div.innerHTML = `${createPoop(item.hex)}<div class="label" id="l-${item.name}"></div>`;
+            div.ondragover = e => e.preventDefault();
+            div.ondrop = e => {
+                const data = e.dataTransfer.getData('text');
+                if(data === item.name) {
+                    div.classList.add('correct');
+                    document.getElementById('l-'+data).innerText = data;
+                    document.getElementById('w-'+data).classList.add('hidden');
+                    if(++count === colorData.length) document.getElementById('message').innerText = "🎉 太棒了！全部正确！";
+                }
+            };
+            slots.appendChild(div);
+        });
+        [...colorData].sort(() => Math.random() - 0.5).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'word';
+            div.id = 'w-' + item.name;
+            div.draggable = true;
+            div.innerHTML = `<span class="pinyin">${item.py}</span>${item.name}`;
+            div.ondragstart = e => e.dataTransfer.setData('text', item.name);
+            bank.appendChild(div);
+        });
+    </script>
+</body>
+</html>
